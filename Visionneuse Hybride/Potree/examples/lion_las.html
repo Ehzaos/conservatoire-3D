@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Onglet Smithsonian/Potree - mode robuste</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <link rel="stylesheet" href="build/potree/potree.css">
+  <link rel="stylesheet" href="libs/jquery-ui/jquery-ui.min.css">
+  <link rel="stylesheet" href="libs/openlayers3/ol.css">
+  <link rel="stylesheet" href="libs/spectrum/spectrum.css">
+  <link rel="stylesheet" href="libs/jstree/themes/mixed/style.css">
+  <style>
+    body { margin: 0; }
+    #tabbar {
+      position: fixed; top: 0; left: 0; width: 100vw; z-index: 10;
+      background: #f4f6fc; padding: 10px 0 10px 15px; box-shadow: 0 2px 8px #0001;
+    }
+    .tab-btn { padding: 8px 20px; margin-right: 5px; cursor: pointer; font-weight: bold; background: #eee; border: none; }
+    .tab-btn.active { background: #d2e2ff; }
+    .tabcontent { display: none; position: relative; top: 55px; width: 100vw; min-height: calc(100vh - 55px); background: #fff; }
+    .tabcontent.active { display: block !important; }
+    .potree_container { width: 100%; height: calc(100vh - 55px); position: relative; }
+    #potree_render_area { width: 100%; height: 100%; background-image: url('build/potree/resources/images/background.jpg'); }
+    #potree_sidebar_container { }
+    #smithsonian_iframe { width: 100%; height: calc(100vh - 55px); border: none;}
+  </style>
+
+  <!-- Potree scripts (TOUJOURS le même ordre que dans lion_las.html) -->
+  <script src="libs/jquery/jquery-3.1.1.min.js"></script>
+  <script src="libs/spectrum/spectrum.js"></script>
+  <script src="libs/jquery-ui/jquery-ui.min.js"></script>
+  <script src="libs/other/BinaryHeap.js"></script>
+  <script src="libs/tween/tween.min.js"></script>
+  <script src="libs/d3/d3.js"></script>
+  <script src="libs/proj4/proj4.js"></script>
+  <script src="libs/openlayers3/ol.js"></script>
+  <script src="libs/i18next/i18next.js"></script>
+  <script src="libs/jstree/jstree.js"></script>
+  <script src="build/potree/potree.js"></script>
+  <script src="libs/plasio/js/laslaz.js"></script>
+</head>
+<body>
+
+  <div id="tabbar">
+    <button id="btn_smithsonian" class="tab-btn" onclick="showTab('smithsonian')">Smithsonian</button>
+    <button id="btn_potree" class="tab-btn active" onclick="showTab('potree')">Potree</button>
+  </div>
+
+  <div id="smithsonian_tab" class="tabcontent">
+    <iframe id="smithsonian_iframe" src="Voyager/voyager-explorer-dev.html"></iframe>
+  </div>
+
+  <div id="potree_tab" class="tabcontent active">
+    <!-- Structure Potree EXACTEMENT comme dans lion_las.html -->
+    <div class="potree_container" style="width: 100%; height: 100%; position: relative;">
+      <div id="potree_render_area" style="background-image: url('build/potree/resources/images/background.jpg');"></div>
+      <div id="potree_sidebar_container"></div>
+    </div>
+  </div>
+
+  <!-- Initialisation Potree (AUCUN type="module" ni import THREE) -->
+  <script>
+    // Potree doit être initialisé TANT QUE la div est visible, donc on le fait AU CHARGEMENT
+    window.viewer = new Potree.Viewer(document.getElementById("potree_render_area"), {
+      sidebar: document.getElementById("potree_sidebar_container")
+    });
+
+    viewer.setEDLEnabled(true);
+    viewer.setFOV(60);
+    viewer.setPointBudget(1_000_000);
+    viewer.loadSettingsFromURL();
+
+    viewer.setDescription("Loading Octree of LAS files");
+
+    viewer.loadGUI(() => {
+      viewer.setLanguage('en');
+      $("#menu_appearance").next().show();
+    });
+
+    Potree.loadPointCloud("pointclouds/lion_takanawa_las/cloud.js", "lion", function(e){
+      viewer.scene.addPointCloud(e.pointcloud);
+      let material = e.pointcloud.material;
+      material.size = 1;
+      material.pointSizeType = Potree.PointSizeType.ADAPTIVE;
+      e.pointcloud.position.x += 3;
+      e.pointcloud.position.y -= 3;
+      e.pointcloud.position.z += 4;
+      viewer.fitToScreen();
+    });
+
+    // Gestion onglets
+    function showTab(tab) {
+      document.getElementById('smithsonian_tab').classList.remove('active');
+      document.getElementById('potree_tab').classList.remove('active');
+      document.getElementById('btn_smithsonian').classList.remove('active');
+      document.getElementById('btn_potree').classList.remove('active');
+      document.getElementById(tab + '_tab').classList.add('active');
+      document.getElementById('btn_' + tab).classList.add('active');
+      if(tab === 'potree') {
+        // Forcer resize Potree pour s'adapter si on revient sur l'onglet
+        setTimeout(function() {
+          if(window.viewer && typeof window.viewer.resize === "function") window.viewer.resize();
+        }, 100);
+      }
+    }
+    // Potree par défaut à l'ouverture (ou Smithsonian si tu veux)
+    window.onload = function() {
+      showTab('potree');
+    };
+  </script>
+</body>
+</html>

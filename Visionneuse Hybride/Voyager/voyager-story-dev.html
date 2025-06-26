@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Voyager Story - Import UI like si.edu</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" type="image/png" href="favicon.png"/>
+    <link href="/fonts/fonts.css" rel="stylesheet">
+    <link href="css/voyager-story.dev.css" rel="stylesheet">
+    <style>
+        body { background: #303030; }
+        #importer-wrap {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: 10000;
+            background: rgba(48,48,48, 0.97);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        #importer-box {
+            border: 3px dashed #ffda00;
+            background: #211f20;
+            color: #fff4e3;
+            border-radius: 22px;
+            padding: 3em 2em;
+            text-align: center;
+            font-size: 1.3em;
+            font-family: inherit;
+            max-width: 400px;
+            box-shadow: 0 6px 48px #211f2080;
+        }
+        #import-file {
+            display: none;
+        }
+        .custom-btn {
+            margin-top: 2em;
+            padding: 1em 2em;
+            border-radius: 22px;
+            background: #317c7a;
+            color: #fff;
+            border: none;
+            font-size: 1.1em;
+            cursor: pointer;
+            font-family: inherit;
+            transition: background 0.2s;
+        }
+        .custom-btn:hover {
+            background: #269285;
+        }
+        voyager-story {
+            display: block;
+            width: 100vw;
+            height: 100vh;
+            min-height: 600px;
+        }
+    </style>
+    <script defer src="js/voyager-story.dev.js"></script>
+</head>
+<body>
+    <!-- Overlay Import UI -->
+    <div id="importer-wrap">
+        <div id="importer-box">
+            <div>Déposez un fichier <b>.svx.json</b> ou <b>.glb</b><br> ou cliquez pour importer :</div>
+            <button class="custom-btn" id="importBtn">Importer un modèle</button>
+            <input type="file" id="import-file" accept=".svx.json,.glb">
+            <div style="font-size:0.8em;margin-top:1em;color:#cfcce7;">(Aucun fichier n'est envoyé, tout reste local)</div>
+        </div>
+    </div>
+
+    <!-- Visionneuse -->
+    <voyager-story id="voyagerStory" style="display:none;"></voyager-story>
+
+    <script>
+        const importerWrap = document.getElementById('importer-wrap');
+        const importBtn = document.getElementById('importBtn');
+        const input = document.getElementById('import-file');
+        const viewer = document.getElementById('voyagerStory');
+        const box = document.getElementById('importer-box');
+
+        // Affiche file picker quand on clique sur le bouton
+        importBtn.addEventListener('click', () => input.click());
+
+        // Drag & drop sur la zone d'import
+        importerWrap.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            box.style.background = "#317c7a";
+            box.style.color = "#fff";
+        });
+        importerWrap.addEventListener('dragleave', () => {
+            box.style.background = "#211f20";
+            box.style.color = "#fff4e3";
+        });
+        importerWrap.addEventListener('drop', async (e) => {
+            e.preventDefault();
+            handleFiles(e.dataTransfer.files);
+        });
+
+        // File picker
+        input.addEventListener('change', () => {
+            handleFiles(input.files);
+        });
+
+        async function handleFiles(files) {
+            const file = files[0];
+            if (!file) return;
+            if (file.name.endsWith('.svx.json')) {
+                const text = await file.text();
+                const blob = new Blob([text], {type: "application/json"});
+                const url = URL.createObjectURL(blob);
+                viewer.setAttribute('document', url);
+                viewer.setAttribute('root', '/');
+            } else if (file.name.endsWith('.glb')) {
+                const glbURL = URL.createObjectURL(file);
+                const svx = {
+                  asset: { type: "application/si-dpo-3d.document+json", version: "1.0", generator: "Importer" },
+                  scene: 0,
+                  scenes: [{ name: "Scene", units: "mm", nodes: [0] }],
+                  nodes: [{ name: file.name, model: 0 }],
+                  models: [{
+                    units: "mm",
+                    derivatives: [{
+                      usage: "Web3D",
+                      quality: "High",
+                      assets: [{ uri: glbURL, type: "Model" }]
+                    }]
+                  }]
+                };
+                const blob = new Blob([JSON.stringify(svx)], {type: "application/json"});
+                const svxURL = URL.createObjectURL(blob);
+                viewer.setAttribute('document', svxURL);
+                viewer.setAttribute('root', '/');
+            } else {
+                alert("Format non supporté. Choisis un .svx.json ou un .glb !");
+                return;
+            }
+            // On cache l'import UI, on montre la visionneuse !
+            importerWrap.style.display = 'none';
+            viewer.style.display = 'block';
+        }
+    </script>
+</body>
+</html>

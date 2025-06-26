@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Onglets Potree + Smithsonian (iframe)</title>
+  <style>
+    body { margin: 0; }
+    #tabbar {
+      position: fixed; top: 0; left: 0; width: 100vw; z-index: 10;
+      background: #f4f6fc; padding: 10px 0 10px 15px; box-shadow: 0 2px 8px #0001;
+    }
+    .tab-btn { padding: 8px 20px; margin-right: 5px; cursor: pointer; font-weight: bold; background: #eee; border: none; }
+    .tab-btn.active { background: #d2e2ff; }
+    .tabcontent { display: none; position: relative; top: 55px; width: 100vw; min-height: calc(100vh - 55px); background: #fff; }
+    .tabcontent.active { display: block !important; }
+    .tab-iframe { width: 100%; height: calc(100vh - 55px); border: none; }
+  </style>
+</head>
+<body>
+  <div id="tabbar">
+    <button id="btn_potree" class="tab-btn active" onclick="showTab('potree')">Potree</button>
+    <button id="btn_smithsonian" class="tab-btn" onclick="showTab('smithsonian')">Smithsonian</button>
+  </div>
+
+  <div id="potree_tab" class="tabcontent active">
+    <iframe class="tab-iframe" src="./Potree/potreetest.html"></iframe>
+    <!-- Chemin = vers TON fichier Potree autonome, qui marche déjà -->
+  </div>
+  <div id="smithsonian_tab" class="tabcontent">
+    <iframe class="tab-iframe" src="Voyager/voyager-explorer-dev.html"></iframe>
+  </div>
+
+  <script>
+    function showTab(tab) {
+      document.getElementById('potree_tab').classList.remove('active');
+      document.getElementById('smithsonian_tab').classList.remove('active');
+      document.getElementById('btn_potree').classList.remove('active');
+      document.getElementById('btn_smithsonian').classList.remove('active');
+      document.getElementById(tab + '_tab').classList.add('active');
+      document.getElementById('btn_' + tab).classList.add('active');
+    }
+    window.onload = function() {
+      showTab('potree');
+    };
+  </script>
+</body>
+</html>
