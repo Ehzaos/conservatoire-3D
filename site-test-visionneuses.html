@@ -62,20 +62,27 @@
       font-size: 1rem;
       color: #555;
       font-weight: 500;
-      margin-bottom: 10px;
+    }
+    .panel-buttons {
+      display: flex;
+      gap: 10px;
     }
   </style>
 </head>
 <body>
   <p class="intro">Présentations des 4 outils/visionneuses 3D</p>
   <div class="button-container">
-    <a href="viewer1.html" class="btn">Smithsonian & Potree</a>
-    <a href="viewer2.html" class="btn">Smithsonian éditeur SVX</a>
+    <!-- Boutons classiques -->
+    <a href="viewer1.html" class="btn">Visionneuse 3D 1</a>
+    <a href="viewer2.html" class="btn">Visionneuse 3D 2</a>
 
+    <!-- Encadré sobre pour les deux dernières -->
     <div class="panel">
       <div class="panel-header">Visionneuse personnelle</div>
-      <a href="viewer3.html" class="btn">ArchVi3D</a>
-      <a href="viewer4.html" class="btn">(ArchVi3D Drag and Drop</a>
+      <div class="panel-buttons">
+        <a href="viewer3.html" class="btn">Visionneuse 3D 3</a>
+        <a href="viewer4.html" class="btn">Visionneuse 3D 4</a>
+      </div>
     </div>
   </div>
 </body>
