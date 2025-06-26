@@ -10,15 +10,25 @@
     html, body { height: 100%; }
     body {
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       background-color: #f4f4f4;
       color: #333;
+      padding: 20px;
+    }
+    .intro {
+      margin-bottom: 20px;
+      font-size: 1.25rem;
+      text-align: center;
+      color: #555;
     }
     .button-container {
       display: flex;
       gap: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
     }
     .btn {
       display: inline-block;
@@ -38,14 +48,35 @@
     .btn:active {
       transform: translateY(0);
     }
+    .panel {
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      background-color: #fff;
+    }
+    .panel-header {
+      font-size: 1rem;
+      color: #555;
+      font-weight: 500;
+      margin-bottom: 10px;
+    }
   </style>
 </head>
 <body>
+  <p class="intro">Présentations des 4 outils/visionneuses 3D</p>
   <div class="button-container">
-    <a href="viewer1.html" class="btn">Visionneuse 3D 1</a>
-    <a href="viewer2.html" class="btn">Visionneuse 3D 2</a>
-    <a href="viewer3.html" class="btn">Visionneuse 3D 3</a>
-    <a href="viewer4.html" class="btn">Visionneuse 3D 4</a>
+    <a href="viewer1.html" class="btn">Smithsonian & Potree</a>
+    <a href="viewer2.html" class="btn">Smithsonian éditeur SVX</a>
+
+    <div class="panel">
+      <div class="panel-header">Visionneuse personnelle</div>
+      <a href="viewer3.html" class="btn">ArchVi3D</a>
+      <a href="viewer4.html" class="btn">(ArchVi3D Drag and Drop</a>
+    </div>
   </div>
 </body>
 </html>
